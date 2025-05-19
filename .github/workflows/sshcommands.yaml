@@ -1,5 +1,5 @@
 name: Remote SSH Command
-on: 
+on:
   push:
     branches:
       - main
@@ -12,24 +12,23 @@ jobs:
     name: Build
     runs-on: ubuntu-latest
     steps:
-      - name: Execute remote SSH commands using password
+      - name: Test network connectivity
+        run: |
+          ping -c 4 ${{ secrets.HOST }}
+          nc -zv ${{ secrets.HOST }} ${{ secrets.PORT }}
+
+      - name: Execute remote SSH commands
         uses: appleboy/ssh-action@v1
         with:
           host: ${{ secrets.HOST }}
           username: ${{ secrets.USERNAME }}
           password: ${{ secrets.PASSWORD }}
           port: ${{ secrets.PORT }}
+          timeout: 120  # Increase timeout (120 seconds)
           script: |
-           whoami
-           hostname
-           debug : true
-
-            docker stop jenkins
-            docker rm jenkins
-            pwd 
-            ls -la
+            whoami
+            hostname
+            docker stop jenkins || true
+            docker rm jenkins || true
             docker build -t jenkins .
-            docker run  -d --name jenkins  -p 9000:9000  jenkins
-
-          
-
+            docker run -d --name jenkins -p 9000:9000 jenkins
