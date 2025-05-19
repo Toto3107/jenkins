@@ -3,5 +3,6 @@ from python:3.9-slim-buster
 WORKDIR /app
 
 ADD . .
-RUN pip install requirements.txt
+RUN pip install -r requirements.txt
+
 CMD ["python", "app.py"]
