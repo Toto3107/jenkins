@@ -10,32 +10,34 @@ on:
 
 jobs:
   build:
-    name: Build
     runs-on: ubuntu-latest
 
     steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+
       - name: Setup SSH Key
         run: |
           mkdir -p ~/.ssh
           echo "${{ secrets.SSH_PRIVATE_KEY }}" > ~/.ssh/id_rsa
           chmod 600 ~/.ssh/id_rsa
-          ssh-keyscan -H ${{ secrets.HOST }} >> ~/.ssh/known_hosts
+          ssh-keyscan -p ${{ secrets.PORT }} -H ${{ secrets.HOST }} >> ~/.ssh/known_hosts
 
-      - name: Debug SSH Connection
+      - name: Test SSH Connection
         run: |
-          ssh -i ~/.ssh/id_rsa -p ${{ secrets.PORT }} -o StrictHostKeyChecking=no ${{ secrets.USERNAME }}@${{ secrets.HOST }} "whoami; hostname"
+          ssh -i ~/.ssh/id_rsa -p ${{ secrets.PORT }} -o StrictHostKeyChecking=no ${{ secrets.USERNAME }}@${{ secrets.HOST }} "whoami && hostname"
 
-      - name: Execute Remote SSH Commands
+      - name: Run Remote SSH Commands
         uses: appleboy/ssh-action@v1
         with:
           host: ${{ secrets.HOST }}
           username: ${{ secrets.USERNAME }}
           key: ${{ secrets.SSH_PRIVATE_KEY }}
           port: ${{ secrets.PORT }}
-          timeout: 120
           script: |
             whoami
             hostname
+            cd /home/ubuntu/your_project_directory  # change if needed
             docker stop jenkins || true
             docker rm jenkins || true
             docker build -t jenkins .
