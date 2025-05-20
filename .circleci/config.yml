@@ -4,7 +4,7 @@ version: 2.1
 executors:
   docker-publisher: 
     environment:
-      IMAGE_NAME: docker.io/mayank3107/jenkins:main
+      IMAGE_NAME: docker.io/mayank3107/jenkins
     docker: 
       - image: circleci/node:latest
         auth:
