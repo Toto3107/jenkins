@@ -47,8 +47,7 @@ jobs:
           subject-name: docker.io/mayank3107/jenkins
           subject-digest: ${{ steps.push.outputs.digest }}
           push-to-registry: true
-build:
-  name: Deploy
+      -  name: Deploy
   runs-on: ubuntu-latest
   steps:
     - name: executing remote ssh commands using password
@@ -62,3 +61,5 @@ build:
           docker stop jenkins
           docker rm jenkins
           docker run -d --name jenkins -p 9000:9000 docker.io/mayank3107/jenkins:main
+
+  
