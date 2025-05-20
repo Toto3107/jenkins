@@ -47,19 +47,20 @@ jobs:
           subject-name: docker.io/mayank3107/jenkins
           subject-digest: ${{ steps.push.outputs.digest }}
           push-to-registry: true
-      -  name: Deploy
-  runs-on: ubuntu-latest
-  steps:
-    - name: executing remote ssh commands using password
-      uses: appleboy/ssh-action@v0.1.7
-      with:
-        host: ${{ secrets.HOST }}
-        username: ${{ secrets.USERNAME }}
-        password: ${{ secrets.PASSWORD }}
-        port: ${{ secrets.PORT }}
-        script: |
-          docker stop jenkins
-          docker rm jenkins
-          docker run -d --name jenkins -p 9000:9000 docker.io/mayank3107/jenkins:main
 
-  
+  deploy:
+    name: Deploy
+    runs-on: ubuntu-latest
+    needs: push_to_registry  # ensures this job runs after the build & push
+    steps:
+      - name: executing remote ssh commands using password
+        uses: appleboy/ssh-action@v0.1.7
+        with:
+          host: ${{ secrets.HOST }}
+          username: ${{ secrets.USERNAME }}
+          password: ${{ secrets.PASSWORD }}
+          port: ${{ secrets.PORT }}
+          script: |
+            docker stop jenkins || true
+            docker rm jenkins || true
+            docker run -d --name jenkins -p 9000:9000 docker.io/mayank3107/jenkins:main
