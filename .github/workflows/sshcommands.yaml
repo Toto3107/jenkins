@@ -3,7 +3,7 @@ name: Publish Docker image
 on:
   push:
     branches:
-      - main  
+      - fake
 
 jobs:
   push_to_registry:
@@ -63,4 +63,5 @@ jobs:
           script: |
             docker stop jenkins || true
             docker rm jenkins || true
+            docker rmi docker.io/mayank3107/jenkins:main
             docker run -d --name jenkins -p 9000:9000 docker.io/mayank3107/jenkins:main
